@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const useAuthStore = create((set) => ({
     accessToken: null,
     refreshToken: null,
+    isLoadingTokens: true,
     expiresAt: null,
 
     // Load tokens from persistent storage when the application starts
@@ -14,10 +15,16 @@ const useAuthStore = create((set) => ({
             const expiresAt = await AsyncStorage.getItem('expiresAt');
 
             if (accessToken && refreshToken && expiresAt) {
-                set({ accessToken, refreshToken, expiresAt: parseInt(expiresAt, 10) });
+                set({
+                    accessToken,
+                    refreshToken,
+                    expiresAt: parseInt(expiresAt, 10)
+                });
             }
         } catch (error) {
             console.error('Error al cargar los tokens:', error);
+        } finally {
+            set({ isLoadingTokens: false });
         }
     },
 

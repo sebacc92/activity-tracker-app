@@ -1,4 +1,4 @@
-import { View, StyleSheet, Button } from "react-native";
+import { View, StyleSheet, Button, ActivityIndicator, Text } from "react-native";
 import * as WebBrowser from 'expo-web-browser';
 import { makeRedirectUri, useAuthRequest, exchangeCodeAsync } from 'expo-auth-session';
 import { useEffect } from "react";
@@ -16,7 +16,7 @@ const discovery = {
 
 export default function Index() {
   const router = useRouter();
-  const { accessToken, setTokens } = useAuthStore();
+  const { accessToken, isLoadingTokens, setTokens, loadTokens } = useAuthStore();
   console.log('accessToken useAuthStore', accessToken)
 
   const [request, response, promptAsync] = useAuthRequest(
@@ -29,6 +29,10 @@ export default function Index() {
     },
     discovery
   );
+
+  useEffect(() => {
+    loadTokens();
+  }, []);
 
   useEffect(() => {
     if (response?.type === 'success') {
@@ -65,10 +69,19 @@ export default function Index() {
   }, [response]);
   
   useEffect(() => {
-    if (accessToken) {
+    if (!isLoadingTokens && accessToken) {
       router.replace('/activities');
     }
   }, [accessToken]);
+
+  if (isLoadingTokens) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Cargando tokens...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
