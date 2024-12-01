@@ -1,9 +1,17 @@
+import useAuthStore from '@/stores/useAuthStore';
+
 export const fetchActivities = async ({ queryKey }) => {
     const accessToken = queryKey[1];
     const params = queryKey[2] || {};
+    const { expiresAt, refreshAccessToken } = useAuthStore.getState();
 
     if (!accessToken) {
         throw new Error('No access token available');
+    }
+
+    const currentTime = Math.floor(Date.now() / 1000);
+    if (expiresAt && currentTime >= expiresAt) {
+        await refreshAccessToken();
     }
 
     const perPage = 200;

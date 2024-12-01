@@ -40,6 +40,38 @@ const useAuthStore = create((set) => ({
         }
     },
 
+    refreshAccessToken: async () => {
+        const { refreshToken } = get();
+        if (!refreshToken) return;
+
+        try {
+            const response = await fetch('https://www.strava.com/oauth/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    client_id: process.env.EXPO_PUBLIC_CLIENT_ID,
+                    client_secret: process.env.EXPO_PUBLIC_CLIENT_SECRET,
+                    grant_type: 'refresh_token',
+                    refresh_token: refreshToken,
+                }),
+            });
+
+            const result = await response.json();
+
+            if (result.access_token) {
+                await setTokens({
+                    accessToken: result.access_token,
+                    refreshToken: result.refresh_token,
+                    expiresAt: result.expires_at,
+                });
+            }
+        } catch (error) {
+            console.error('Error al refrescar el token:', error);
+        }
+    },
+
     // Clear tokens from state and persistent storage
     logout: async () => {
         try {

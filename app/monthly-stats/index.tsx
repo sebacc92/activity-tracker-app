@@ -1,11 +1,19 @@
 // app/monthly-stats/index.tsx
 import React, { useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
+import {
+    View,
+    Text,
+    FlatList,
+    TouchableOpacity,
+    ActivityIndicator,
+    StyleSheet,
+} from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import { fetchActivities } from '@/api/stravaApi';
 import { useRouter } from 'expo-router';
 import dayjs from 'dayjs';
 import useAuthStore from '@/stores/useAuthStore';
+import { Card, Title, Paragraph } from 'react-native-paper';
 
 interface Activity {
     id: number;
@@ -14,7 +22,6 @@ interface Activity {
     distance: number;
     moving_time: number;
     total_elevation_gain: number;
-    // otros campos si los necesitas
 }
 
 interface AggregatedData {
@@ -48,33 +55,31 @@ export default function MonthlyStatsScreen() {
 
     if (isLoadingTokens) {
         return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#0000ff" />
-                <Text>Cargando tokens...</Text>
+                <Text>Loading tokens...</Text>
             </View>
         );
     }
 
     if (isLoading) {
         return (
-            <View>
+            <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#0000ff" />
-                <Text>Cargando estadísticas...</Text>
+                <Text>Loading statistics...</Text>
             </View>
         );
     }
 
     if (isError) {
         return (
-            <View>
-                <Text>Error al cargar estadísticas: {error.message}</Text>
+            <View style={styles.errorContainer}>
+                <Text>Error loading statistics: {error.message}</Text>
             </View>
         );
     }
 
-    console.log('data', data)
-
-    // Procesar y agregar actividades por mes
+    // Process and aggregate activities by month
     const aggregatedData: AggregatedData = {};
 
     data?.forEach((activity) => {
@@ -112,21 +117,38 @@ export default function MonthlyStatsScreen() {
                             });
                         }}
                     >
-                        <View style={{ padding: 10 }}>
-                            <Text>{dayjs(item).format('MMMM YYYY')}</Text>
-                            <Text>
-                                Distancia Total: {(monthData.totalDistance / 1000).toFixed(2)} km
-                            </Text>
-                            <Text>
-                                Tiempo Total: {(monthData.totalTime / 3600).toFixed(2)} horas
-                            </Text>
-                            <Text>
-                                Elevación Total: {monthData.totalElevationGain.toFixed(2)} metros
-                            </Text>
-                        </View>
+                        <Card style={styles.card}>
+                            <Card.Content>
+                                <Title>{dayjs(item).format('MMMM YYYY')}</Title>
+                                <Paragraph>
+                                    Total Distance: {(monthData.totalDistance / 1000).toFixed(2)} km
+                                </Paragraph>
+                                <Paragraph>
+                                    Total Time: {(monthData.totalTime / 3600).toFixed(2)} hours
+                                </Paragraph>
+                                <Paragraph>
+                                    Total Elevation Gain: {monthData.totalElevationGain.toFixed(2)} meters
+                                </Paragraph>
+                            </Card.Content>
+                        </Card>
                     </TouchableOpacity>
                 );
             }}
         />
     );
 }
+
+const styles = StyleSheet.create({
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    errorContainer: {
+        padding: 20,
+        alignItems: 'center',
+    },
+    card: {
+        margin: 10,
+    },
+});

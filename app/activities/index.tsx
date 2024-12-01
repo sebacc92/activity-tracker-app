@@ -1,11 +1,13 @@
 // app/activities/index.tsx
 import React, { useEffect } from 'react';
-import { View, Text, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Button } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import useAuthStore from '@/stores/useAuthStore';
 import { fetchActivities } from '@/api/stravaApi';
+import { Card, Title, Paragraph } from 'react-native-paper';
 import dayjs from 'dayjs';
+import useAuthStore from '@/stores/useAuthStore';
+import useActivitiesStore from '@/stores/useActivitiesStore';
 
 interface Activity {
   id: number;
@@ -18,18 +20,10 @@ interface Activity {
 
 export default function Activities() {
   const router = useRouter();
-  const { accessToken, isLoadingTokens, loadTokens } = useAuthStore();
+  const { accessToken, isLoadingTokens, loadTokens, logout } = useAuthStore();
+  const { activities, setActivities } = useActivitiesStore();
+
   const { month } = useLocalSearchParams();
-
-  useEffect(() => {
-    loadTokens();
-  }, []);
-
-  useEffect(() => {
-    if (!isLoadingTokens && !accessToken) {
-      router.replace('/');
-    }
-  }, [accessToken, isLoadingTokens]);
 
   let after = undefined;
   let before = undefined;
@@ -47,6 +41,22 @@ export default function Activities() {
     queryFn: fetchActivities,
     enabled: !!accessToken,
   });
+
+  useEffect(() => {
+    loadTokens();
+  }, []);
+
+  useEffect(() => {
+    if (!isLoadingTokens && !accessToken) {
+      router.replace('/');
+    }
+  }, [accessToken, isLoadingTokens]);
+
+  useEffect(() => {
+    if (data) {
+      setActivities(data);
+    }
+  }, [data]);
 
   if (isLoadingTokens) {
     return (
@@ -72,27 +82,43 @@ export default function Activities() {
     );
   }
 
-  const activities = data;
-
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container}>
+      <Button title="Cerrar Sesión" onPress={() => {
+        logout();
+        router.replace('/');
+      }} />
       <FlatList
         data={activities}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <View style={{ padding: 10 }}>
-            <Text>Nombre: {item.name}</Text>
-            <Text>
-              Fecha: {new Date(item.start_date).toLocaleDateString()}
-            </Text>
-            <Text>Distancia: {(item.distance / 1000).toFixed(2)} km</Text>
-            <Text>Tiempo: {(item.moving_time / 60).toFixed(2)} min</Text>
-            <Text>
-              Elevación: {item.total_elevation_gain.toFixed(2)} metros
-            </Text>
-          </View>
+          <Card style={{ margin: 10 }}>
+            <Card.Content>
+              <Title>{item.name}</Title>
+              <Paragraph>Fecha: {new Date(item.start_date).toLocaleDateString()}</Paragraph>
+              <Paragraph>Distancia: {(item.distance / 1000).toFixed(2)} km</Paragraph>
+              <Paragraph>Tiempo: {(item.moving_time / 60).toFixed(2)} min</Paragraph>
+              <Paragraph>Elevación: {item.total_elevation_gain.toFixed(2)} metros</Paragraph>
+            </Card.Content>
+          </Card>
         )}
       />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  activityItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  activityName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+});
