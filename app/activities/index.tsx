@@ -2,9 +2,10 @@
 import React, { useEffect } from 'react';
 import { View, Text, FlatList, ActivityIndicator } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import useAuthStore from '@/stores/useAuthStore';
 import { fetchActivities } from '@/api/stravaApi';
+import dayjs from 'dayjs';
 
 interface Activity {
   id: number;
@@ -18,7 +19,7 @@ interface Activity {
 export default function Activities() {
   const router = useRouter();
   const { accessToken, isLoadingTokens, loadTokens } = useAuthStore();
-  console.log('accessToken', accessToken)
+  const { month } = useLocalSearchParams();
 
   useEffect(() => {
     loadTokens();
@@ -30,16 +31,26 @@ export default function Activities() {
     }
   }, [accessToken, isLoadingTokens]);
 
+  let after = undefined;
+  let before = undefined;
+
+  if (month) {
+    const startOfMonth = dayjs(month as string).startOf('month').unix();
+    const endOfMonth = dayjs(month as string).endOf('month').unix();
+
+    after = startOfMonth;
+    before = endOfMonth;
+  }
+
   const { data, error, isLoading: isLoadingActivities, isError } = useQuery<Activity[], Error>({
-    queryKey: ['activities', accessToken],
+    queryKey: ['activities', accessToken, { after, before }],
     queryFn: fetchActivities,
     enabled: !!accessToken,
   });
 
   if (isLoadingTokens) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#0000ff" />
+      <View>
         <Text>Cargando tokens...</Text>
       </View>
     );
@@ -47,8 +58,7 @@ export default function Activities() {
 
   if (isLoadingActivities) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#0000ff" />
+      <View>
         <Text>Cargando actividades...</Text>
       </View>
     );
@@ -56,7 +66,7 @@ export default function Activities() {
 
   if (isError) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View>
         <Text>Error al cargar actividades: {error.message}</Text>
       </View>
     );
