@@ -3,8 +3,6 @@ import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-nativ
 import { useQuery } from '@tanstack/react-query';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { fetchActivities } from '@/api/stravaApi';
-import { Card } from 'react-native-paper';
-import dayjs from 'dayjs';
 import useAuthStore from '@/stores/useAuthStore';
 import useActivitiesStore from '@/stores/useActivitiesStore';
 import { Ionicons } from '@expo/vector-icons';

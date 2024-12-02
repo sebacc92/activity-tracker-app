@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
     FlatList,
     ActivityIndicator,
     StyleSheet,
+    TouchableOpacity,
 } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import { fetchActivities } from '@/api/stravaApi';
@@ -13,6 +14,7 @@ import dayjs from 'dayjs';
 import useAuthStore from '@/stores/useAuthStore';
 import { Ionicons } from '@expo/vector-icons';
 import { MonthlyStatsCard } from '@/components/MonthlyStatsCard';
+import { ActivityCard } from '@/components/ActivityCard';
 
 interface Activity {
     id: number;
@@ -35,6 +37,7 @@ interface AggregatedData {
 export default function MonthlyStatsScreen() {
     const router = useRouter();
     const { accessToken, isLoadingTokens, loadTokens } = useAuthStore();
+    const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
 
     useEffect(() => {
         loadTokens();
@@ -94,27 +97,51 @@ export default function MonthlyStatsScreen() {
     const months = Object.keys(aggregatedData).sort().reverse();
 
     const handleMonthPress = (month: string) => {
-        router.push({
-            pathname: '/activities',
-            params: { month },
-        });
+        setSelectedMonth(month);
+    };
+
+    const renderContent = () => {
+        if (selectedMonth) {
+            const monthData = aggregatedData[selectedMonth];
+            return (
+                <>
+                    <TouchableOpacity style={styles.backButton} onPress={() => setSelectedMonth(null)}>
+                        <Ionicons name="arrow-back" size={24} color="#4CAF50" />
+                        <Text style={styles.backButtonText}>Back to Monthly Stats</Text>
+                    </TouchableOpacity>
+                    <Text style={styles.monthHeader}>{dayjs(selectedMonth).format('MMMM YYYY')}</Text>
+                    <FlatList
+                        data={monthData.activities}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({ item }) => <ActivityCard activity={item} />}
+                        contentContainerStyle={styles.listContainer}
+                    />
+                </>
+            );
+        } else {
+            return (
+                <FlatList
+                    data={months}
+                    keyExtractor={(item) => item}
+                    renderItem={({ item }) => (
+                        <MonthlyStatsCard
+                            month={item}
+                            data={aggregatedData[item]}
+                            onPress={handleMonthPress}
+                        />
+                    )}
+                    contentContainerStyle={styles.listContainer}
+                />
+            );
+        }
     };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.header}>Monthly Statistics</Text>
-            <FlatList
-                data={months}
-                keyExtractor={(item) => item}
-                renderItem={({ item }) => (
-                    <MonthlyStatsCard
-                        month={item}
-                        data={aggregatedData[item]}
-                        onPress={handleMonthPress}
-                    />
-                )}
-                contentContainerStyle={styles.listContainer}
-            />
+            <Text style={styles.header}>
+                {selectedMonth ? 'Monthly Activities' : 'Monthly Statistics'}
+            </Text>
+            {renderContent()}
         </View>
     );
 }
@@ -156,4 +183,22 @@ const styles = StyleSheet.create({
     listContainer: {
         padding: 10,
     },
+    backButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 10,
+    },
+    backButtonText: {
+        marginLeft: 10,
+        fontSize: 16,
+        color: '#4CAF50',
+    },
+    monthHeader: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginBottom: 10,
+        color: '#4CAF50',
+    },
 });
+

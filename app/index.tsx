@@ -50,14 +50,13 @@ const discovery = {
 export default function Index() {
   const router = useRouter();
   const { accessToken, isLoadingTokens, setTokens, loadTokens } = useAuthStore();
-  console.log('accessToken useAuthStore', accessToken)
 
   const [request, response, promptAsync] = useAuthRequest(
     {
       clientId: process.env.EXPO_PUBLIC_CLIENT_ID!,
       scopes: ['activity:read_all'],
       redirectUri: makeRedirectUri({
-        native: 'http://localhost',
+        native: 'activity-tracker-app://redirect',
       }),
     },
     discovery
@@ -100,7 +99,7 @@ export default function Index() {
       exchangeCodeAsync({
         clientId: process.env.EXPO_PUBLIC_CLIENT_ID!,
         redirectUri: makeRedirectUri({
-          native: 'http://localhost',
+          native: 'activity-tracker-app://redirect',
         }),
         code,
         extraParams: {
@@ -111,8 +110,6 @@ export default function Index() {
       {
         tokenEndpoint: discovery.tokenEndpoint,
       }).then(async (result) => {
-        console.log('result', result)
-        console.log('Access token: ', result.accessToken);
         if (result.accessToken) {
           setTokens(result.accessToken, result.refreshToken);
           await setTokens({
@@ -177,6 +174,7 @@ export default function Index() {
           ))}
         </View>
         <TouchableOpacity
+          disabled={!request}
           style={styles.button}
           onPress={() => {
             promptAsync();
