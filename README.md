@@ -1,4 +1,4 @@
-# Activity Tracker App
+# 🚴 Activity Tracker App
 
 This is an activity tracking app built with [Expo](https://expo.dev) and [React Native](https://reactnative.dev). The app integrates with the [Strava API](https://developers.strava.com/) to authenticate users and display activity data.
 
@@ -12,7 +12,7 @@ This is an activity tracking app built with [Expo](https://expo.dev) and [React 
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
 Follow these steps to set up and run the project:
 
@@ -36,7 +36,7 @@ Create a `.env` file in the root directory of the project and include the follow
 EXPO_PUBLIC_CLIENT_ID=your-strava-client-id
 EXPO_PUBLIC_CLIENT_SECRET=your-strava-client-secret
 ```
-> **Note:** Note: The CLIENT_SECRET is used for local development only and should be securely stored in production.
+> ⚠️ **Note:** Note: The CLIENT_SECRET is used for local development only and should be securely stored in production.
 
 ### 4. Start the app
 
@@ -51,14 +51,14 @@ You can then open the app on:
 - An [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
 - The [Expo Go](https://expo.dev/go) app
 
-## 5. Using the app
+## 5. 🎯 Using the app
 
 1. Click "Login with Strava" to authenticate with your Strava account.
 2. After login, you will be redirected to a screen displaying activities.
 
 ---
 
-## Features
+## 🌟 Features
 
 - **OAuth2 Authentication with Strava:** Users can log in using their Strava credentials.
 - **Token Management:** Tokens (access, refresh, expiration) are securely stored using Zustand and AsyncStorage.
@@ -67,7 +67,7 @@ You can then open the app on:
 
 ---
 
-## Assumptions
+## 🤔 Assumptions
 
 During development, the following assumptions were made:
 
@@ -77,27 +77,7 @@ During development, the following assumptions were made:
 
 ---
 
-## Areas for Improvement
-
-Given more time, the following areas could be improved:
-
-1. **UI/UX Enhancements:**
-   - Design and implement a polished interface for the activity list.
-   - Add loading indicators and error messages for a smoother user experience.
-2. **Token Refresh Logic:**
-   - Automatically refresh expired tokens using the `refresh_token`.
-   - Handle token refresh errors gracefully.
-3. **Error Handling:**
-   - Add detailed error messages for API calls and authentication failures.
-4. **Testing:**
-   - Implement unit and integration tests for critical components.
-   - Add end-to-end tests for the authentication flow.
-5. **Secure Secrets Management:**
-   - Use a backend or secure store for sensitive data like `client_secret`.
-
----
-
-## Additional Notes
+## 📌  Additional Notes
 
 - **Expo Router:** The app uses `expo-router` for file-based navigation, simplifying route management.
 - **State Management:** Zustand is used to handle authentication state, with support for persistent tokens via AsyncStorage.
