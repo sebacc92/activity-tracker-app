@@ -65,7 +65,7 @@ export default function Activities() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#0000ff" />
-        <Text style={styles.loadingText}>Cargando...</Text>
+        <Text style={styles.loadingText}>Loading...</Text>
       </View>
     );
   }
@@ -74,7 +74,7 @@ export default function Activities() {
     return (
       <View style={styles.errorContainer}>
         <Ionicons name="alert-circle-outline" size={50} color="red" />
-        <Text style={styles.errorText}>Error al cargar actividades: {error.message}</Text>
+        <Text style={styles.errorText}>Error loading activities: {error.message}</Text>
       </View>
     );
   }
@@ -111,9 +111,9 @@ export default function Activities() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.subtitle}>Últimas 4 semanas</Text>
+        <Text style={styles.subtitle}>Last 4 weeks</Text>
         <Text style={styles.activityCount}>{activities.length}</Text>
-        <Text style={styles.caption}>Total de actividades</Text>
+        <Text style={styles.caption}>Total activities</Text>
       </View>
       <FlatList
         data={activities}
@@ -129,7 +129,7 @@ export default function Activities() {
         }}
       >
         <Ionicons name="log-out-outline" size={24} color="white" />
-        <Text style={styles.logoutButtonText}>Cerrar Sesión</Text>
+        <Text style={styles.logoutButtonText}>Log Out</Text>
       </TouchableOpacity>
     </View>
   );

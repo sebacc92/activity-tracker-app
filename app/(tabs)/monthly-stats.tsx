@@ -1,4 +1,3 @@
-// app/monthly-stats/index.tsx
 import React, { useEffect } from 'react';
 import {
     View,
@@ -13,7 +12,8 @@ import { fetchActivities } from '@/api/stravaApi';
 import { useRouter } from 'expo-router';
 import dayjs from 'dayjs';
 import useAuthStore from '@/stores/useAuthStore';
-import { Card, Title, Paragraph } from 'react-native-paper';
+import { Card } from 'react-native-paper';
+import { Ionicons } from '@expo/vector-icons';
 
 interface Activity {
     id: number;
@@ -53,20 +53,11 @@ export default function MonthlyStatsScreen() {
         enabled: !!accessToken,
     });
 
-    if (isLoadingTokens) {
+    if (isLoadingTokens || isLoading) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#0000ff" />
-                <Text>Loading tokens...</Text>
-            </View>
-        );
-    }
-
-    if (isLoading) {
-        return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#0000ff" />
-                <Text>Loading statistics...</Text>
+                <ActivityIndicator size="large" color="#4CAF50" />
+                <Text style={styles.loadingText}>Loading statistics...</Text>
             </View>
         );
     }
@@ -74,7 +65,8 @@ export default function MonthlyStatsScreen() {
     if (isError) {
         return (
             <View style={styles.errorContainer}>
-                <Text>Error loading statistics: {error.message}</Text>
+                <Ionicons name="alert-circle-outline" size={50} color="red" />
+                <Text style={styles.errorText}>Error loading statistics: {error.message}</Text>
             </View>
         );
     }
@@ -102,53 +94,123 @@ export default function MonthlyStatsScreen() {
 
     const months = Object.keys(aggregatedData).sort().reverse();
 
+    const renderMonthItem = ({ item }: { item: string }) => {
+        const monthData = aggregatedData[item];
+        return (
+            <TouchableOpacity
+                onPress={() => {
+                    router.push({
+                        pathname: '/activities',
+                        params: { month: item },
+                    });
+                }}
+            >
+                <Card style={styles.card}>
+                    <Card.Content>
+                        <Text style={styles.monthTitle}>{dayjs(item).format('MMMM YYYY')}</Text>
+                        <View style={styles.statsContainer}>
+                            <View style={styles.statItem}>
+                                <Ionicons name="fitness-outline" size={24} color="#4CAF50" />
+                                <Text style={styles.statValue}>{monthData.activities.length}</Text>
+                                <Text style={styles.statLabel}>Activities</Text>
+                            </View>
+                            <View style={styles.statItem}>
+                                <Ionicons name="speedometer-outline" size={24} color="#2196F3" />
+                                <Text style={styles.statValue}>{(monthData.totalDistance / 1000).toFixed(1)}</Text>
+                                <Text style={styles.statLabel}>Total km</Text>
+                            </View>
+                            <View style={styles.statItem}>
+                                <Ionicons name="time-outline" size={24} color="#FFC107" />
+                                <Text style={styles.statValue}>{Math.floor(monthData.totalTime / 3600)}</Text>
+                                <Text style={styles.statLabel}>Total Hours</Text>
+                            </View>
+                            <View style={styles.statItem}>
+                                <Ionicons name="trending-up-outline" size={24} color="#FF5722" />
+                                <Text style={styles.statValue}>{Math.floor(monthData.totalElevationGain)}</Text>
+                                <Text style={styles.statLabel}>Total m elevation</Text>
+                            </View>
+                        </View>
+                    </Card.Content>
+                </Card>
+            </TouchableOpacity>
+        );
+    };
+
     return (
-        <FlatList
-            data={months}
-            keyExtractor={(item) => item}
-            renderItem={({ item }) => {
-                const monthData = aggregatedData[item];
-                return (
-                    <TouchableOpacity
-                        onPress={() => {
-                            router.push({
-                                pathname: '/activities',
-                                params: { month: item },
-                            });
-                        }}
-                    >
-                        <Card style={styles.card}>
-                            <Card.Content>
-                                <Title>{dayjs(item).format('MMMM YYYY')}</Title>
-                                <Paragraph>
-                                    Total Distance: {(monthData.totalDistance / 1000).toFixed(2)} km
-                                </Paragraph>
-                                <Paragraph>
-                                    Total Time: {(monthData.totalTime / 3600).toFixed(2)} hours
-                                </Paragraph>
-                                <Paragraph>
-                                    Total Elevation Gain: {monthData.totalElevationGain.toFixed(2)} meters
-                                </Paragraph>
-                            </Card.Content>
-                        </Card>
-                    </TouchableOpacity>
-                );
-            }}
-        />
+        <View style={styles.container}>
+            <Text style={styles.header}>Monthly Statistics</Text>
+            <FlatList
+                data={months}
+                keyExtractor={(item) => item}
+                renderItem={renderMonthItem}
+                contentContainerStyle={styles.listContainer}
+            />
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#f5f5f5',
+    },
+    header: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginVertical: 20,
+        color: '#4CAF50',
+    },
     loadingContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
     },
+    loadingText: {
+        marginTop: 10,
+        fontSize: 16,
+        color: '#4CAF50',
+    },
     errorContainer: {
-        padding: 20,
+        flex: 1,
+        justifyContent: 'center',
         alignItems: 'center',
+        padding: 20,
+    },
+    errorText: {
+        marginTop: 10,
+        fontSize: 16,
+        color: 'red',
+        textAlign: 'center',
+    },
+    listContainer: {
+        padding: 10,
     },
     card: {
-        margin: 10,
+        marginBottom: 15,
+        elevation: 3,
+        borderRadius: 10,
+    },
+    monthTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 10,
+        color: '#333',
+    },
+    statsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    statItem: {
+        alignItems: 'center',
+    },
+    statValue: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginTop: 5,
+    },
+    statLabel: {
+        fontSize: 12,
+        color: '#666',
     },
 });
