@@ -1,22 +1,25 @@
 import {
   View,
   StyleSheet,
-  Button,
   ActivityIndicator,
   Text,
   Image,
   TouchableOpacity,
   SafeAreaView,
-  FlatList,
   Dimensions,
   Animated,
-  ScrollView
+  ScrollView,
+  NativeSyntheticEvent, NativeScrollEvent
 } from "react-native";
 import * as WebBrowser from 'expo-web-browser';
 import { makeRedirectUri, useAuthRequest, exchangeCodeAsync } from 'expo-auth-session';
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "expo-router";
 import useAuthStore from "@/stores/useAuthStore";
+
+interface HandleScroll {
+  (event: NativeSyntheticEvent<NativeScrollEvent>): void;
+}
 
 const { width, height } = Dimensions.get('window');
 
@@ -61,13 +64,12 @@ export default function Index() {
   );
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const flatListRef = useRef(null);
   const scrollViewRef = useRef(null);
   const fadeAnim = useRef(new Animated.Value(1)).current;
 
-  const handleScroll = (event) => {
-    const contentOffsetX = event.nativeEvent.contentOffset.x;
-    const newIndex = Math.round(contentOffsetX / width);
+  const handleScroll: HandleScroll = (event) => {
+    const contentOffsetX: number = event.nativeEvent.contentOffset.x;
+    const newIndex: number = Math.round(contentOffsetX / width);
     if (newIndex !== currentIndex) {
       setCurrentIndex(newIndex);
     }
@@ -136,7 +138,7 @@ export default function Index() {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" color="#0000ff" />
-        <Text>Cargando tokens...</Text>
+        <Text>Loading tokens...</Text>
       </View>
     );
   }
