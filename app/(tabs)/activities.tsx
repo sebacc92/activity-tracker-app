@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import React, { useEffect, useMemo } from 'react';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { fetchActivities } from '@/api/stravaApi';
@@ -8,6 +8,8 @@ import dayjs from 'dayjs';
 import useAuthStore from '@/stores/useAuthStore';
 import useActivitiesStore from '@/stores/useActivitiesStore';
 import { Ionicons } from '@expo/vector-icons';
+import { getDateRange } from '@/utils/dateUtils';
+import { ActivityCard } from '@/components/ActivityCard';
 
 interface Activity {
   id: number;
@@ -20,24 +22,11 @@ interface Activity {
 
 export default function Activities() {
   const router = useRouter();
-  const { accessToken, isLoadingTokens, loadTokens, logout } = useAuthStore();
+  const { accessToken, isLoadingTokens, loadTokens } = useAuthStore();
   const { activities, setActivities } = useActivitiesStore();
-
   const { month } = useLocalSearchParams();
 
-  let after = undefined;
-  let before = undefined;
-
-  if (month) {
-    const startOfMonth = dayjs(month as string).startOf('month').unix();
-    const endOfMonth = dayjs(month as string).endOf('month').unix();
-
-    after = startOfMonth;
-    before = endOfMonth;
-  } else {
-    after = dayjs().subtract(4, 'weeks').unix();
-    before = dayjs().unix();
-  }
+  const { after, before } = useMemo(() => getDateRange(month), [month]);
 
   const { data, error, isLoading: isLoadingActivities, isError } = useQuery<Activity[], Error>({
     queryKey: ['activities', accessToken, { after, before }],
@@ -79,35 +68,6 @@ export default function Activities() {
     );
   }
 
-  const renderActivityItem = ({ item }: { item: Activity }) => (
-    <Card style={styles.card}>
-      <Card.Content>
-        <View style={styles.cardHeader}>
-          <Ionicons name="fitness-outline" size={24} color="#4CAF50" />
-          <Text style={styles.activityName}>{item.name}</Text>
-        </View>
-        <View style={styles.cardBody}>
-          <View style={styles.infoItem}>
-            <Ionicons name="calendar-outline" size={16} color="#666" />
-            <Text style={styles.infoText}>{dayjs(item.start_date).format('DD MMM YYYY')}</Text>
-          </View>
-          <View style={styles.infoItem}>
-            <Ionicons name="speedometer-outline" size={16} color="#666" />
-            <Text style={styles.infoText}>{(item.distance / 1000).toFixed(2)} km</Text>
-          </View>
-          <View style={styles.infoItem}>
-            <Ionicons name="time-outline" size={16} color="#666" />
-            <Text style={styles.infoText}>{Math.floor(item.moving_time / 60)} min</Text>
-          </View>
-          <View style={styles.infoItem}>
-            <Ionicons name="trending-up-outline" size={16} color="#666" />
-            <Text style={styles.infoText}>{item.total_elevation_gain.toFixed(0)} m</Text>
-          </View>
-        </View>
-      </Card.Content>
-    </Card>
-  );
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -118,7 +78,7 @@ export default function Activities() {
       <FlatList
         data={activities}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={renderActivityItem}
+        renderItem={({ item }) => <ActivityCard activity={item} />}
         contentContainerStyle={styles.listContainer}
       />
     </View>
@@ -173,52 +133,6 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     padding: 10,
-  },
-  card: {
-    marginBottom: 10,
-    elevation: 3,
-    borderRadius: 10,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  activityName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginLeft: 10,
-  },
-  cardBody: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
-  },
-  infoItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 10,
-    marginBottom: 5,
-  },
-  infoText: {
-    marginLeft: 5,
-    fontSize: 14,
-    color: '#666',
-  },
-  logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FF5722',
-    padding: 15,
-    margin: 10,
-    borderRadius: 10,
-  },
-  logoutButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginLeft: 10,
-  },
+  }
 });
 

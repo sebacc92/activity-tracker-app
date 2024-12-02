@@ -14,6 +14,7 @@ import dayjs from 'dayjs';
 import useAuthStore from '@/stores/useAuthStore';
 import { Card } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
+import { MonthlyStatsCard } from '@/components/MonthlyStatsCard';
 
 interface Activity {
     id: number;
@@ -94,46 +95,11 @@ export default function MonthlyStatsScreen() {
 
     const months = Object.keys(aggregatedData).sort().reverse();
 
-    const renderMonthItem = ({ item }: { item: string }) => {
-        const monthData = aggregatedData[item];
-        return (
-            <TouchableOpacity
-                onPress={() => {
-                    router.push({
-                        pathname: '/activities',
-                        params: { month: item },
-                    });
-                }}
-            >
-                <Card style={styles.card}>
-                    <Card.Content>
-                        <Text style={styles.monthTitle}>{dayjs(item).format('MMMM YYYY')}</Text>
-                        <View style={styles.statsContainer}>
-                            <View style={styles.statItem}>
-                                <Ionicons name="fitness-outline" size={24} color="#4CAF50" />
-                                <Text style={styles.statValue}>{monthData.activities.length}</Text>
-                                <Text style={styles.statLabel}>Activities</Text>
-                            </View>
-                            <View style={styles.statItem}>
-                                <Ionicons name="speedometer-outline" size={24} color="#2196F3" />
-                                <Text style={styles.statValue}>{(monthData.totalDistance / 1000).toFixed(1)}</Text>
-                                <Text style={styles.statLabel}>Total km</Text>
-                            </View>
-                            <View style={styles.statItem}>
-                                <Ionicons name="time-outline" size={24} color="#FFC107" />
-                                <Text style={styles.statValue}>{Math.floor(monthData.totalTime / 3600)}</Text>
-                                <Text style={styles.statLabel}>Total Hours</Text>
-                            </View>
-                            <View style={styles.statItem}>
-                                <Ionicons name="trending-up-outline" size={24} color="#FF5722" />
-                                <Text style={styles.statValue}>{Math.floor(monthData.totalElevationGain)}</Text>
-                                <Text style={styles.statLabel}>Total m elevation</Text>
-                            </View>
-                        </View>
-                    </Card.Content>
-                </Card>
-            </TouchableOpacity>
-        );
+    const handleMonthPress = (month: string) => {
+        router.push({
+            pathname: '/activities',
+            params: { month },
+        });
     };
 
     return (
@@ -142,7 +108,13 @@ export default function MonthlyStatsScreen() {
             <FlatList
                 data={months}
                 keyExtractor={(item) => item}
-                renderItem={renderMonthItem}
+                renderItem={({ item }) => (
+                    <MonthlyStatsCard
+                        month={item}
+                        data={aggregatedData[item]}
+                        onPress={handleMonthPress}
+                    />
+                )}
                 contentContainerStyle={styles.listContainer}
             />
         </View>
