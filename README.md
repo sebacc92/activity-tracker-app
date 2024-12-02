@@ -1,50 +1,108 @@
-# Welcome to your Expo app 👋
+# Activity Tracker App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This is an activity tracking app built with [Expo](https://expo.dev) and [React Native](https://reactnative.dev). The app integrates with the [Strava API](https://developers.strava.com/) to authenticate users and display activity data.
 
-## Get started
+## Table of Contents
 
-1. Install dependencies
+- [Getting Started](#getting-started)
+- [Features](#features)
+- [Assumptions](#assumptions)
+- [Areas for Improvement](#areas-for-improvement)
+- [Additional Notes](#additional-notes)
 
-   ```bash
-   npm install
-   ```
+---
 
-2. Start the app
+## Getting Started
 
-   ```bash
-    npx expo start
-   ```
+Follow these steps to set up and run the project:
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+### 1. Clone the repository
 
 ```bash
-npm run reset-project
+git clone <your-repository-url>
+cd activity-tracker-app
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Install dependencies
 
-## Learn more
+```bash
+npm install
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+### 3. Configure environment variables
+Create a `.env` file in the root directory of the project and include the following variables:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+EXPO_PUBLIC_CLIENT_ID=your-strava-client-id
+EXPO_PUBLIC_CLIENT_SECRET=your-strava-client-secret
+```
+> **Note:** Note: The CLIENT_SECRET is used for local development only and should be securely stored in production.
 
-## Join the community
+### 4. Start the app
 
-Join our community of developers creating universal apps.
+```bash
+npx expo start
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+You can then open the app on:
+
+- A [development build](https://docs.expo.dev/develop/development-builds/introduction/)
+- An [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
+- An [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
+- The [Expo Go](https://expo.dev/go) app
+
+## 5. Using the app
+
+1. Click "Login with Strava" to authenticate with your Strava account.
+2. After login, you will be redirected to a screen displaying activities.
+
+---
+
+## Features
+
+- **OAuth2 Authentication with Strava:** Users can log in using their Strava credentials.
+- **Token Management:** Tokens (access, refresh, expiration) are securely stored using Zustand and AsyncStorage.
+- **Dynamic Routing:** The app uses file-based routing with `expo-router`.
+- **Activity Display:** The app fetches and displays user activities from Strava (pending further development).
+
+---
+
+## Assumptions
+
+During development, the following assumptions were made:
+
+1. The app will use the [Strava API](https://developers.strava.com/) to authenticate and fetch activity data.
+2. The `EXPO_PUBLIC_CLIENT_SECRET` is stored in `.env` for local testing but should not be used in production.
+3. The app will initially focus on authentication and displaying basic activity data.
+
+---
+
+## Areas for Improvement
+
+Given more time, the following areas could be improved:
+
+1. **UI/UX Enhancements:**
+   - Design and implement a polished interface for the activity list.
+   - Add loading indicators and error messages for a smoother user experience.
+2. **Token Refresh Logic:**
+   - Automatically refresh expired tokens using the `refresh_token`.
+   - Handle token refresh errors gracefully.
+3. **Error Handling:**
+   - Add detailed error messages for API calls and authentication failures.
+4. **Testing:**
+   - Implement unit and integration tests for critical components.
+   - Add end-to-end tests for the authentication flow.
+5. **Secure Secrets Management:**
+   - Use a backend or secure store for sensitive data like `client_secret`.
+
+---
+
+## Additional Notes
+
+- **Expo Router:** The app uses `expo-router` for file-based navigation, simplifying route management.
+- **State Management:** Zustand is used to handle authentication state, with support for persistent tokens via AsyncStorage.
+- **Strava Integration:** The app uses the Strava API for authentication and will later expand to fetch user activities and statistics.
+
+For any questions or suggestions, feel free to reach out or open an issue in the repository.
+
+---
