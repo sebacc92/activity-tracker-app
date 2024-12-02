@@ -1,4 +1,3 @@
-// components/ActivityCard.tsx
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { Card } from 'react-native-paper';

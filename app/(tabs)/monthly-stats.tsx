@@ -3,7 +3,6 @@ import {
     View,
     Text,
     FlatList,
-    TouchableOpacity,
     ActivityIndicator,
     StyleSheet,
 } from 'react-native';
@@ -12,7 +11,6 @@ import { fetchActivities } from '@/api/stravaApi';
 import { useRouter } from 'expo-router';
 import dayjs from 'dayjs';
 import useAuthStore from '@/stores/useAuthStore';
-import { Card } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { MonthlyStatsCard } from '@/components/MonthlyStatsCard';
 
@@ -157,32 +155,5 @@ const styles = StyleSheet.create({
     },
     listContainer: {
         padding: 10,
-    },
-    card: {
-        marginBottom: 15,
-        elevation: 3,
-        borderRadius: 10,
-    },
-    monthTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        color: '#333',
-    },
-    statsContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-    statItem: {
-        alignItems: 'center',
-    },
-    statValue: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginTop: 5,
-    },
-    statLabel: {
-        fontSize: 12,
-        color: '#666',
     },
 });
