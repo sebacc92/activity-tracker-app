@@ -1,22 +1,32 @@
-// app/(authenticated)/(tabs)/_layout.tsx
 import { Tabs } from 'expo-router';
-import { FontAwesome } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function TabsLayout() {
     return (
-        <Tabs screenOptions={{ tabBarActiveTintColor: 'blue', headerShown: false }}>
+        <Tabs screenOptions={{ 
+            tabBarActiveTintColor: '#4CAF50', 
+            headerShown: false,
+            tabBarStyle: { backgroundColor: '#f5f5f5' }
+        }}>
             <Tabs.Screen
                 name="activities"
                 options={{
-                    title: 'Recent Activities',
-                    tabBarIcon: ({ color }) => <FontAwesome name="list" size={24} color={color} />,
+                    title: 'Activities',
+                    tabBarIcon: ({ color, size }) => <Ionicons name="fitness-outline" size={size} color={color} />,
                 }}
             />
             <Tabs.Screen
                 name="monthly-stats"
                 options={{
                     title: 'Monthly Stats',
-                    tabBarIcon: ({ color }) => <FontAwesome name="bar-chart" size={24} color={color} />,
+                    tabBarIcon: ({ color, size }) => <Ionicons name="stats-chart-outline" size={size} color={color} />,
+                }}
+            />
+            <Tabs.Screen
+                name="profile"
+                options={{
+                    title: 'My Profile',
+                    tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
                 }}
             />
         </Tabs>

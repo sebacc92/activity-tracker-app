@@ -121,16 +121,6 @@ export default function Activities() {
         renderItem={renderActivityItem}
         contentContainerStyle={styles.listContainer}
       />
-      <TouchableOpacity
-        style={styles.logoutButton}
-        onPress={() => {
-          logout();
-          router.replace('/');
-        }}
-      >
-        <Ionicons name="log-out-outline" size={24} color="white" />
-        <Text style={styles.logoutButtonText}>Log Out</Text>
-      </TouchableOpacity>
     </View>
   );
 }

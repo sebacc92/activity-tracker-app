@@ -51,3 +51,29 @@ export const fetchActivities = async ({ queryKey }) => {
 
     return allActivities;
 };
+
+export const fetchAthleteProfile = async ({ queryKey }) => {
+    const accessToken = queryKey[1];
+    const { expiresAt, refreshAccessToken } = useAuthStore.getState();
+
+    if (!accessToken) {
+        throw new Error('No access token available');
+    }
+
+    const currentTime = Math.floor(Date.now() / 1000);
+    if (expiresAt && currentTime >= expiresAt) {
+        await refreshAccessToken();
+    }
+
+    const response = await fetch('https://www.strava.com/api/v3/athlete', {
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error('Error fetching athlete profile');
+    }
+
+    return response.json();
+}
